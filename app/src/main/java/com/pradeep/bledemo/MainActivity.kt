@@ -8,7 +8,10 @@ import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import com.google.android.material.snackbar.Snackbar
 import com.pradeep.bledemo.databinding.ActivityMainBinding
 
 const val REQUEST_ENABLE_BT=1001
@@ -42,13 +45,32 @@ class MainActivity : AppCompatActivity() {
                     Manifest.permission.BLUETOOTH_CONNECT
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
-                startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)
+               getResult.launch(enableBtIntent)
                 return
             }
 
         }else{
-            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Bluetooth is already on", Toast.LENGTH_SHORT).show()
         }
 
     }
+
+
+
+    private val getResult=
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ){
+            if (it.resultCode== RESULT_OK){
+                    Snackbar.make(binding.root,"Bluetooth is enabled", Snackbar.LENGTH_SHORT).show()
+            }else if (it.resultCode == RESULT_CANCELED){
+                Snackbar.make(binding.root,"Bluetooth is not enabled", Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
+
+
+
+
+
 }
